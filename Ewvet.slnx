@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ewvet/Ewvet.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ewvet.Tests/Ewvet.Tests.csproj" />
+  </Folder>
+</Solution>
