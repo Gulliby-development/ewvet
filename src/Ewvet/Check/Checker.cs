@@ -5,7 +5,7 @@ namespace Ewvet;
 
 public static class Checker
 {
-    public static Output Check(List<Inputs.Source> sources)
+    public static Output Check(List<Inputs.Source> sources, ISet<string>? ignored = null, bool quiet = false)
     {
         ArgumentNullException.ThrowIfNull(sources);
 
@@ -27,10 +27,19 @@ public static class Checker
                 for (var codeIndex = 0; codeIndex < occurrence.Reading.Codes.Count; codeIndex++)
                 {
                     var code = occurrence.Reading.Codes[codeIndex];
+                    if (ignored is not null && ignored.Contains(code))
+                    {
+                        continue;
+                    }
+
                     var detail = occurrence.Reading.Details[codeIndex];
                     var message = Problems.Message(code, detail);
-                    report.Append(FormattableString.Invariant(
-                        $"{source.Display}:{lines.Line(occurrence.Start)}:{lines.Col(occurrence.Start)}: {code} {message}\n"));
+                    if (!quiet)
+                    {
+                        report.Append(FormattableString.Invariant(
+                            $"{source.Display}:{lines.Line(occurrence.Start)}:{lines.Col(occurrence.Start)}: {code} {message}\n"));
+                    }
+
                     problemCount++;
                     sourceHasProblems = true;
                 }

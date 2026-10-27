@@ -38,7 +38,7 @@ The command synopsis is:
 ```
 usage: ewvet decode [--strict] FILE
        ewvet explain FILE
-       ewvet check FILE...
+       ewvet check [--quiet] [--ignore CODES] FILE...
        ewvet encode [--charset NAME] [--encoding auto|b|q] FILE
        ewvet charsets [PREFIX]
 ```
@@ -166,11 +166,34 @@ utf-8        utf8                  1 to 4
 
 Exit status: 0.
 
+To leave out a kind of problem, or to print only the summary, add `--ignore` or `--quiet` to `check`:
+
+```sh
+printf 'X-One: =?a?= =?koi8-r?Q?x?= =?utf-8?X?a?= =?utf-8?B?S?=\n' > one-line.txt
+ewvet check --ignore EW002 one-line.txt
+ewvet check --quiet --ignore EW001,EW002 one-line.txt
+```
+
+Output of the first command, with status 1:
+
+```text
+one-line.txt:1:8: EW001 malformed encoded word "=?a?="
+one-line.txt:1:29: EW003 unknown encoding "X"
+one-line.txt:1:43: EW004 invalid base64 text
+3 problems in 1 file
+```
+
+Output of the second command, with status 1:
+
+```text
+2 problems in 1 file
+```
+
 ## Commands
 
 - `decode [--strict] FILE` replaces each decoded encoded word with its text. Unrecognized or invalid words stay unchanged. The optional `--strict` flag still writes the decoded text, but returns status 1 if any word has a problem.
 - `explain FILE` prints a table with each encoded-word occurrence, its line and column, any ignored gap, how it was decoded, the result, and its problem codes. If there are no occurrences, it prints the headings only.
-- `check FILE...` reads every named file, then reports each encoded-word problem and a summary. It returns status 1 when it finds problems.
+- `check [--quiet] [--ignore CODES] FILE...` reads every named file, then reports each encoded-word problem and a summary. It returns status 1 when it finds problems. `--ignore CODES` leaves out the problems with the listed codes, a comma-separated list such as `EW002,EW008` of codes from `EW001` to `EW009`: they are neither listed nor counted, and a file whose problems are all ignored counts as clean. `--quiet` prints only the summary line. A repeated `--ignore` keeps the last list; an unknown code is an error (status 2).
 - `encode [--charset NAME] [--encoding auto|b|q] FILE` encodes text that needs encoding. The default charset is `utf-8`; `--charset` also accepts the supported charset aliases. The default encoding choice is `auto`: it selects the shorter representation and chooses Q on a tie. Use `b` or `q` to choose one explicitly.
 - `charsets [PREFIX]` lists the supported charsets and aliases, optionally filtered by a name or alias prefix.
 
