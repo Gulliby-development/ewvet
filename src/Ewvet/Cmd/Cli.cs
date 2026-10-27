@@ -5,7 +5,7 @@ public static class Cli
     private const string HelpText =
         "usage: ewvet decode [--strict] FILE\n" +
         "       ewvet explain FILE\n" +
-        "       ewvet check FILE...\n" +
+        "       ewvet check [--quiet] [--ignore CODES] FILE...\n" +
         "       ewvet encode [--charset NAME] [--encoding auto|b|q] FILE\n" +
         "       ewvet charsets [PREFIX]\n";
 
@@ -30,12 +30,18 @@ public static class Cli
                 throw new Failure("unknown command " + Text.Show(command));
             }
 
-            ISet<string> flags = command == "decode"
-                ? new HashSet<string>(StringComparer.Ordinal) { "--strict" }
-                : new HashSet<string>(StringComparer.Ordinal);
-            ISet<string> valued = command == "encode"
-                ? new HashSet<string>(StringComparer.Ordinal) { "--charset", "--encoding" }
-                : new HashSet<string>(StringComparer.Ordinal);
+            ISet<string> flags = command switch
+            {
+                "decode" => new HashSet<string>(StringComparer.Ordinal) { "--strict" },
+                "check" => new HashSet<string>(StringComparer.Ordinal) { "--quiet" },
+                _ => new HashSet<string>(StringComparer.Ordinal),
+            };
+            ISet<string> valued = command switch
+            {
+                "encode" => new HashSet<string>(StringComparer.Ordinal) { "--charset", "--encoding" },
+                "check" => new HashSet<string>(StringComparer.Ordinal) { "--ignore" },
+                _ => new HashSet<string>(StringComparer.Ordinal),
+            };
 
             var parsed = Options.Parse(argv.Skip(1).ToArray(), flags, valued);
             var inputs = new Inputs(io);

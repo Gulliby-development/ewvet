@@ -12,7 +12,7 @@ public sealed class UnitTest1
     [InlineData(new string[] { "--help", "decode" }, 2, "", "ewvet: unknown command \"--help\"\n")]
     [InlineData(new string[] { "Decode" }, 2, "", "ewvet: unknown command \"Decode\"\n")]
     [InlineData(new string[] { "😀" }, 2, "", "ewvet: unknown command \"?\"\n")]
-    [InlineData(new string[] { "--help" }, 0, "usage: ewvet decode [--strict] FILE\n       ewvet explain FILE\n       ewvet check FILE...\n       ewvet encode [--charset NAME] [--encoding auto|b|q] FILE\n       ewvet charsets [PREFIX]\n", "")]
+    [InlineData(new string[] { "--help" }, 0, "usage: ewvet decode [--strict] FILE\n       ewvet explain FILE\n       ewvet check [--quiet] [--ignore CODES] FILE...\n       ewvet encode [--charset NAME] [--encoding auto|b|q] FILE\n       ewvet charsets [PREFIX]\n", "")]
     public void DispatchesOnlyCommandsAndSoleHelp(string[] argv, int expectedCode, string expectedOut, string expectedErr)
     {
         var io = new FakeIo();

@@ -30,7 +30,7 @@ public sealed class DocsTests
         string readme = ReadReadme();
         const string usage = "usage: ewvet decode [--strict] FILE\n"
             + "       ewvet explain FILE\n"
-            + "       ewvet check FILE...\n"
+            + "       ewvet check [--quiet] [--ignore CODES] FILE...\n"
             + "       ewvet encode [--charset NAME] [--encoding auto|b|q] FILE\n"
             + "       ewvet charsets [PREFIX]";
 
