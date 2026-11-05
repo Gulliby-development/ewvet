@@ -28,13 +28,31 @@ public static class CheckCommand
             }
         }
 
+        var max = int.MaxValue;
+        if (values.TryGetValue("--max", out var limit))
+        {
+            if (!IsLimit(limit))
+            {
+                throw new Failure("--max must be a whole number from 1 to 9999");
+            }
+
+            max = int.Parse(limit, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
         var sources = new List<Inputs.Source>(args.Count);
         foreach (var arg in args)
         {
             sources.Add(inputs.Read(arg));
         }
 
-        return Checker.Check(sources, ignored, flags.Contains("--quiet"));
+        return Checker.Check(sources, ignored, flags.Contains("--quiet"), max);
+    }
+
+    private static bool IsLimit(string text)
+    {
+        return text.Length is >= 1 and <= 4
+            && text[0] is >= '1' and <= '9'
+            && text.All(c => c is >= '0' and <= '9');
     }
 
     private static bool IsProblemCode(string code)
