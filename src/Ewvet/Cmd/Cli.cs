@@ -5,7 +5,7 @@ public static class Cli
     private const string HelpText =
         "usage: ewvet decode [--strict] FILE\n" +
         "       ewvet explain FILE\n" +
-        "       ewvet check [--quiet] [--ignore CODES] FILE...\n" +
+        "       ewvet check [--quiet] [--ignore CODES] [--max N] FILE...\n" +
         "       ewvet encode [--charset NAME] [--encoding auto|b|q] FILE\n" +
         "       ewvet charsets [PREFIX]\n";
 
@@ -39,7 +39,7 @@ public static class Cli
             ISet<string> valued = command switch
             {
                 "encode" => new HashSet<string>(StringComparer.Ordinal) { "--charset", "--encoding" },
-                "check" => new HashSet<string>(StringComparer.Ordinal) { "--ignore" },
+                "check" => new HashSet<string>(StringComparer.Ordinal) { "--ignore", "--max" },
                 _ => new HashSet<string>(StringComparer.Ordinal),
             };
 

@@ -38,7 +38,7 @@ The command synopsis is:
 ```
 usage: ewvet decode [--strict] FILE
        ewvet explain FILE
-       ewvet check [--quiet] [--ignore CODES] FILE...
+       ewvet check [--quiet] [--ignore CODES] [--max N] FILE...
        ewvet encode [--charset NAME] [--encoding auto|b|q] FILE
        ewvet charsets [PREFIX]
 ```
@@ -98,6 +98,24 @@ mail.txt:4:24: EW006 invalid quoted-printable text
 mail.txt:4:39: EW007 bytes are not valid utf-8
 mail.txt:4:55: EW009 decoded text has the control character U+0001
 mail.txt:5:9: EW008 encoded word has 76 characters, the limit is 75
+9 problems in 1 file
+```
+
+Exit status: 1.
+
+List only the first two problems of the same `mail.txt` with the built program. After `dotnet build -c Release` the program is the file `src/Ewvet/bin/Release/net10.0/Ewvet.dll`, which `dotnet` runs:
+
+```sh
+dotnet build -c Release
+dotnet src/Ewvet/bin/Release/net10.0/Ewvet.dll check --max 2 mail.txt
+```
+
+Output (after the build messages):
+
+```text
+mail.txt:3:8: EW001 malformed encoded word "=?a?="
+mail.txt:3:14: EW002 unknown charset "koi8-r"
+... 7 more
 9 problems in 1 file
 ```
 
@@ -193,7 +211,7 @@ Output of the second command, with status 1:
 
 - `decode [--strict] FILE` replaces each decoded encoded word with its text. Unrecognized or invalid words stay unchanged. The optional `--strict` flag still writes the decoded text, but returns status 1 if any word has a problem.
 - `explain FILE` prints a table with each encoded-word occurrence, its line and column, any ignored gap, how it was decoded, the result, and its problem codes. If there are no occurrences, it prints the headings only.
-- `check [--quiet] [--ignore CODES] FILE...` reads every named file, then reports each encoded-word problem and a summary. It returns status 1 when it finds problems. `--ignore CODES` leaves out the problems with the listed codes, a comma-separated list such as `EW002,EW008` of codes from `EW001` to `EW009`: they are neither listed nor counted, and a file whose problems are all ignored counts as clean. `--quiet` prints only the summary line. A repeated `--ignore` keeps the last list; an unknown code is an error (status 2).
+- `check [--quiet] [--ignore CODES] [--max N] FILE...` reads every named file, then reports each encoded-word problem and a summary. It returns status 1 when it finds problems. `--ignore CODES` leaves out the problems with the listed codes, a comma-separated list such as `EW002,EW008` of codes from `EW001` to `EW009`: they are neither listed nor counted, and a file whose problems are all ignored counts as clean. `--quiet` prints only the summary line. `--max N` lists at most N problem lines, N a whole number from 1 to 9999 written without a sign or a leading zero; when more problems remain, one line `... M more` follows the list before the summary, and the summary still counts every problem; `--quiet` prints neither the list nor that line. A repeated `--ignore` or `--max` keeps the last value; an unknown code or a bad N is an error (status 2).
 - `encode [--charset NAME] [--encoding auto|b|q] FILE` encodes text that needs encoding. The default charset is `utf-8`; `--charset` also accepts the supported charset aliases. The default encoding choice is `auto`: it selects the shorter representation and chooses Q on a tie. Use `b` or `q` to choose one explicitly.
 - `charsets [PREFIX]` lists the supported charsets and aliases, optionally filtered by a name or alias prefix.
 

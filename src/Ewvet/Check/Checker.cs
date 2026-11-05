@@ -5,7 +5,7 @@ namespace Ewvet;
 
 public static class Checker
 {
-    public static Output Check(List<Inputs.Source> sources, ISet<string>? ignored = null, bool quiet = false)
+    public static Output Check(List<Inputs.Source> sources, ISet<string>? ignored = null, bool quiet = false, int max = int.MaxValue)
     {
         ArgumentNullException.ThrowIfNull(sources);
 
@@ -34,7 +34,7 @@ public static class Checker
 
                     var detail = occurrence.Reading.Details[codeIndex];
                     var message = Problems.Message(code, detail);
-                    if (!quiet)
+                    if (!quiet && problemCount < max)
                     {
                         report.Append(FormattableString.Invariant(
                             $"{source.Display}:{lines.Line(occurrence.Start)}:{lines.Col(occurrence.Start)}: {code} {message}\n"));
@@ -53,6 +53,11 @@ public static class Checker
 
         if (problemCount > 0)
         {
+            if (!quiet && problemCount > max)
+            {
+                report.Append(FormattableString.Invariant($"... {problemCount - max} more\n"));
+            }
+
             report.Append(Text.Plural(problemCount, "problem"));
             report.Append(" in ");
             report.Append(Text.Plural(problematicSourceCount, "file"));

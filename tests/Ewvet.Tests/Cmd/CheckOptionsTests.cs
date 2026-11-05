@@ -76,7 +76,7 @@ public sealed class CheckOptionsTests
         int code = Cli.Run(["--help"], io);
 
         Assert.Equal(0, code);
-        Assert.Contains("       ewvet check [--quiet] [--ignore CODES] FILE...\n", io.OutCalls[0]);
+        Assert.Contains("       ewvet check [--quiet] [--ignore CODES] [--max N] FILE...\n", io.OutCalls[0]);
     }
 
     private static FakeIo NewIo()
